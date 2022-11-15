@@ -4,31 +4,30 @@ pragma solidity ^0.8.9;
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
+// Re-typing the contract code to learn
+
 contract Lock {
     uint public unlockTime;
+
+    // Similar to openzepplins onlyOwner access/Ownable.sol modifier
     address payable public owner;
 
     event Withdrawal(uint amount, uint when);
 
     constructor(uint _unlockTime) payable {
-        require(
-            block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
-        );
-
+        // Deployed with an unlock time and set amount of eth
+        // Require that the unlocktime is NOT in the past       
+        require(block.timestamp < _unlockTime, "Please set an unlock time that is in the future");
         unlockTime = _unlockTime;
         owner = payable(msg.sender);
     }
 
     function withdraw() public {
-        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
-        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
-
-        require(block.timestamp >= unlockTime, "You can't withdraw yet");
-        require(msg.sender == owner, "You aren't the owner");
+        require(block.timestamp >= unlockTime, "Withdrawal not ready yet!");
+        require(msg.sender == owner, "Only owner can withdraw!");
 
         emit Withdrawal(address(this).balance, block.timestamp);
-
         owner.transfer(address(this).balance);
     }
 }
+
